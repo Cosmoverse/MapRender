@@ -79,10 +79,8 @@ imagesavealpha($image, true);
 imagepng($image, $output);
 ```
 
-MapRender has pre-set limitations in place to ensure server load is kept minimum and at the same time maps take as less
-time as possible to render. If these settings do not suit your server hardware, you may tweak them by creating a custom
-MapRender instance.
-
+MapRender has default performance settings to ensure server load is kept minimum and at the same time maps render as
+quickly as possible. If these settings do not suit your server hardware, tweak them by creating a custom MapRender.
 ```php
 $parent = MapRender::create($plugin);
 
