@@ -155,14 +155,8 @@ final class MapRender{
 					}
 					break;
 				case "color": // compute colors for current chunk
-					// colors() reads blocks from top to bottom. but we hold colors in a $stack to apply them from
-					// bottom to top. this takes care of translucent colors.
-					$stack = [];
 					foreach($this->colors($chunk) as [$dx, $y, $dz, $color]){
-						$stack[] = [$ax + $dx, $y, $az + $dz, $color];
-					}
-					for($i = count($stack) - 1; $i >= 0; $i--){
-						yield $stack[$i] => Traverser::VALUE;
+						yield [$ax + $dx, $y, $az + $dz, $color] => Traverser::VALUE;
 					}
 					$state = "sleep";
 					break;
@@ -183,8 +177,8 @@ final class MapRender{
 	}
 
 	/**
-	 * Reads blocks from top to bottom at every column (XZ) of the chunk. A column scan terminates when a block with
-	 * a color opacity of 255 is encountered.
+	 * Reads blocks at every column (XZ) of the chunk. A column scan terminates when a block with a color opacity of 255
+	 * is encountered. Blocks are returned from BOTTOM to TOP.
 	 *
 	 * @param Chunk $chunk the chunk to read colors from
 	 * @return Generator<array{int, int, int, int}> an array of [X (0-15), Y (absolute), Z (0-15), colorIdx]. colors can
@@ -194,7 +188,7 @@ final class MapRender{
 		$sub_chunks = $chunk->getSubChunks();
 		for($x = 0; $x < Chunk::EDGE_LENGTH; $x++){
 			for($z = 0; $z < Chunk::EDGE_LENGTH; $z++){
-				$found = 0;
+				$found = [];
 				for($y = $this->max_subchunk_index; $y >= $this->min_subchunk_index; $y--){
 					$sub_chunk = $sub_chunks[$y];
 					if($sub_chunk->isEmptyFast()){
@@ -207,16 +201,19 @@ final class MapRender{
 							continue;
 						}
 						$color = $this->palette->blocks[$block_id];
-						yield [$x, $yo + $dy, $z, $color];
+						$found[] = [$x, $yo + $dy, $z, $color];
 						$a = $this->palette->colors[$color][3];
 						if($a === 255){
-							continue 3;
+							break 2;
 						}
-						if(++$found === 15){
+						if(count($found) === 15){
 							// bail if we could not find a solid block after encountering 15 translucent blocks
-							continue 3;
+							break 2;
 						}
 					}
+				}
+				for($i = count($found) - 1; $i >= 0; $i--){
+					yield $found[$i];
 				}
 			}
 		}
