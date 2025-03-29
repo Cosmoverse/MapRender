@@ -72,15 +72,12 @@ final class MapRender{
 		imagecolordeallocate($image, $background);
 		imagealphablending($image, true);
 
-		$palette = [];
 		$reader = new Traverser($this->read($world, $x1, $z1, $x2, $z2));
 		while(yield from $reader->next($entry)){
 			[$x, $y, $z, $color] = $entry;
-			if(!isset($palette[$color])){
-				[$r, $g, $b, $a] = $this->palette->colors[$color];
-				$palette[$color] = imagecolorallocatealpha($image, $r, $g, $b, 127 - ($a >> 1));
-			}
-			imagesetpixel($image, $x, $z, $palette[$color]);
+			[$r, $g, $b, $a] = $this->palette->colors[$color];
+			$color = imagecolorallocatealpha($image, $r, $g, $b, 127 - ($a >> 1));
+			imagesetpixel($image, $x, $z, $color);
 		}
 		return $image;
 	}
