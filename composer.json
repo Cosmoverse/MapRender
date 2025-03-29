@@ -1,0 +1,28 @@
+{
+    "name": "cosmicpe/maprender",
+    "description": "PocketMine-MP library to render regions in worlds as a 2D topographic map",
+    "type": "library",
+    "license": "GPL-3.0-only",
+    "require": {
+        "php": "^8.3",
+        "pocketmine/pocketmine-mp": "^5.0.0",
+        "sof3/await-generator": "^3.6.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "cosmicpe\\maprender\\": "src/cosmicpe/maprender"
+        }
+    },
+    "authors": [
+        {
+            "name": "Muqsit",
+            "email": "notmuqsit@gmail.com"
+        }
+    ],
+    "extra": {
+        "virion": {
+            "spec": "3.0",
+            "namespace-root": "cosmicpe\\maprender"
+        }
+    }
+}
