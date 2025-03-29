@@ -120,9 +120,9 @@ final class MapRender{
 						break;
 					}
 					$z0 = $z1;
+					$az = 0;
 					$x0++;
 					if($x0 <= $x2){
-						$az = 0;
 						$ax += Chunk::EDGE_LENGTH;
 						$state = "read";
 						break;
