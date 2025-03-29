@@ -72,10 +72,29 @@ final class MapRender{
 		imagecolordeallocate($image, $background);
 		imagealphablending($image, true);
 
+		$elevation = [];
 		$reader = new Traverser($this->read($world, $x1, $z1, $x2, $z2));
 		while(yield from $reader->next($entry)){
 			[$x, $y, $z, $color] = $entry;
 			[$r, $g, $b, $a] = $this->palette->colors[$color];
+			if($a === 255){
+				$elevation[$x][$z] = $y;
+				if(isset($elevation[$x][$z - 1], $elevation[$x - 1][$z - 1])){
+					$north = $elevation[$x][$z - 1];
+					$north_west = $elevation[$x - 1][$z - 1];
+					$modifier = match(true){
+						$north > $y && $north_west > $y => 0.5294,
+						$north > $y && $north_west <= $y => 0.7058,
+						$north >= $y || $north_west >= $y => 0.8627,
+						default => null
+					};
+					if($modifier !== null){
+						$r = (int) ($r * $modifier);
+						$g = (int) ($g * $modifier);
+						$b = (int) ($b * $modifier);
+					}
+				}
+			}
 			$color = imagecolorallocatealpha($image, $r, $g, $b, 127 - ($a >> 1));
 			imagesetpixel($image, $x, $z, $color);
 		}
