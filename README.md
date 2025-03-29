@@ -24,7 +24,7 @@ $output = $plugin->getDataFolder() . DIRECTORY_SEPARATOR . "map-render.png";
 imagepng($image, $output);
 ```
 
-If you are unfamiliar and are looking for a quick setup, use `Await::f2c()` to make a callback wrapper.
+If you are unfamiliar with await-generator and are looking for a quick setup, use `Await::f2c()` to make a callback wrapper.
 ```php
 /** @param Closure(GdImage) : void */
 public function render(World $world, int $x1, int $z1, int $x2, int $z2, Closure $callback) : void{
@@ -77,4 +77,25 @@ $width = imagesx($image) * 4;
 $image = imagescale($image, $width, -1, IMG_NEAREST_NEIGHBOUR);
 imagesavealpha($image, true);
 imagepng($image, $output);
+```
+
+MapRender has pre-set limitations in place to ensure server load is kept minimum and at the same time maps take as less
+time as possible to render. If these settings do not suit your server hardware, you may tweak them by creating a custom
+MapRender instance.
+
+```php
+$parent = MapRender::create($plugin);
+
+// set custom chunk_loads_per_tick, chunk_gens_per_tick
+$chunk_loads_per_tick = 4;
+$chunk_gens_per_tick = 1;
+$render = new MapRender(
+	$parent->plugin,
+	$parent->palette,
+	$parent->chunks_per_tick,
+	$chunk_loads_per_tick,
+	$chunk_gens_per_tick,
+	$parent->min_subchunk_index,
+	$parent->max_subchunk_index
+);
 ```
