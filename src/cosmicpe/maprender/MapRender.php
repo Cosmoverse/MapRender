@@ -74,9 +74,9 @@ final class MapRender{
 		$elevation = [];
 		$reader = new Traverser($this->read($world, $x1, $z1, $x2, $z2));
 		while(yield from $reader->next($entry)){
-			[$x, $y, $z, $color] = $entry;
+			[$x, $y, $z, $color, $layer] = $entry;
 			[$r, $g, $b, $a] = $this->palette->colors[$color];
-			if($a === 255){
+			if($layer === 1){
 				$elevation[$x][$z] = $y;
 				if(isset($elevation[$x][$z - 1], $elevation[$x - 1][$z - 1])){
 					$north = $elevation[$x][$z - 1];
@@ -108,9 +108,9 @@ final class MapRender{
 	 * @param int $z1 Z coordinate of the chunk to read from (inclusive)
 	 * @param int $x2 X coordinate of the chunk to read until (inclusive)
 	 * @param int $z2 Z coordinate of the chunk to read until (inclusive)
-	 * @return Generator<array{int, int, int, int}, Traverser::VALUE> an array of [X (0-W), Y (absolute), Z (0-H),
-	 * colorIdx]. colors can be accessed by reading this->palette->colors[colorIdx]. W and H are the widths and heights
-	 * of the map (or image) bounds.
+	 * @return Generator<array{int, int, int, int, int<1, 15>}, Traverser::VALUE> an array of [X (0-W), Y (absolute),
+	 * Z (0-H), colorIdx, layer]. colors can be accessed by reading this->palette->colors[colorIdx]. W and H are the
+	 * widths and heights of the map (or image) bounds.
 	 */
 	public function read(World $world, int $x1, int $z1, int $x2, int $z2) : Generator{
 		$x1 <= $x2 || throw new InvalidArgumentException("x1 ({$x1}) must be <= x2 ({$x2})");
@@ -170,8 +170,8 @@ final class MapRender{
 					}
 					break;
 				case "color": // compute colors for current chunk
-					foreach($this->colors($chunk) as [$dx, $y, $dz, $color]){
-						yield [$ax + $dx, $y, $az + $dz, $color] => Traverser::VALUE;
+					foreach($this->colors($chunk) as [$dx, $y, $dz, $color, $layer]){
+						yield [$ax + $dx, $y, $az + $dz, $color, $layer] => Traverser::VALUE;
 					}
 					$state = "sleep";
 					break;
@@ -196,8 +196,8 @@ final class MapRender{
 	 * is encountered. Blocks are returned from BOTTOM to TOP.
 	 *
 	 * @param Chunk $chunk the chunk to read colors from
-	 * @return Generator<array{int, int, int, int}> an array of [X (0-15), Y (absolute), Z (0-15), colorIdx]. colors can
-	 * be accessed by reading this->palette->colors[colorIdx].
+	 * @return Generator<array{int, int, int, int, int<1, 15>}> array of [X (0-15), Y (absolute), Z (0-15), colorIdx,
+	 * layer]. colors can be accessed by reading this->palette->colors[colorIdx].
 	 */
 	public function colors(Chunk $chunk) : Generator{
 		$sub_chunks = $chunk->getSubChunks();
@@ -227,8 +227,10 @@ final class MapRender{
 						}
 					}
 				}
-				for($i = count($found) - 1; $i >= 0; $i--){
-					yield $found[$i];
+				$n = count($found);
+				for($i = $n - 1; $i >= 0; $i--){
+					$e = $found[$i];
+					yield [$e[0], $e[1], $e[2], $e[3], $n - $i];
 				}
 			}
 		}
