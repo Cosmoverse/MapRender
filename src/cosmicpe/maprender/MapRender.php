@@ -26,8 +26,7 @@ use function imagesetpixel;
 final class MapRender{
 
 	public static function create(Plugin $plugin) : self{
-		return new self($plugin, MapColorPalette::default(), 16, 8, 2,
-			Chunk::MIN_SUBCHUNK_INDEX, Chunk::MAX_SUBCHUNK_INDEX);
+		return new self($plugin, MapColorPalette::default(), 16, 8, 2, Chunk::MIN_SUBCHUNK_INDEX, Chunk::MAX_SUBCHUNK_INDEX);
 	}
 
 	/**
