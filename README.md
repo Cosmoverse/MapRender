@@ -97,3 +97,8 @@ $render = new MapRender(
 	$parent->max_subchunk_index
 );
 ```
+
+## Sample rendered output
+<p align="center">
+    <img src="https://github.com/user-attachments/assets/43598aab-7253-43de-95dc-0545ee2a0ed0"/>
+</p>
