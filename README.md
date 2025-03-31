@@ -100,5 +100,5 @@ $render = new MapRender(
 
 ## Sample rendered output
 <p align="center">
-    <img src="https://github.com/user-attachments/assets/43598aab-7253-43de-95dc-0545ee2a0ed0"/>
+    <img src="https://github.com/user-attachments/assets/8ce701d4-a706-4acf-bbc4-048f9e9511ad"/>
 </p>
